@@ -1,0 +1,63 @@
+@startuml
+' Names: Athanase Abayo
+' Date: Sept 21 2025 
+' File: webtech-practice-02-class-diagram.puml
+' Description: Personalized Class Diagram for Attendance System (Practice 02)
+
+class Student {
+    +studentID: String
+    +firstName: String
+    +lastName: String
+    +email: String
+    +phone: String
+    +program: String
+    +yearOfStudy: int
+    +status: String            ' for example we can have active, suspended, graduated
+    +dateRegistered: Date
+}
+
+class Lecturer {
+    +lecturerID: String
+    +firstName: String
+    +lastName: String
+    +email: String
+    +phone: String
+    +office: String
+    +department: String
+    +rank: String              ' LLecturer, Senior Lecturer, Professor, Phd 
+    +dateHired: Date
+}
+
+class Course {
+    +courseCode: String
+    +courseName: String
+    +creditHours: int
+    +semester: String
+    +yearOffered: int
+    +schedule: String          ' for instance e.g. Mon 10:00–12:00
+    +location: String          ' classroom or lab
+    +maxCapacity: int
+}
+
+class AttendanceRecord {
+    +recordID: String
+    +date: Date
+    +status: String            ' Present, Absent, Late, Excused/Asked for permission
+    +timeIn: Time
+    +timeOut: Time
+    +remarks: String
+    +createdAt: DateTime
+    +updatedAt: DateTime
+}
+
+class Admin {
+    +adminID: String
+    +username: String
+    +passwordHash: String
+    +role: String              ' SuperAdmin, DepartmentAdmin, Support
+    +lastLogin: DateTime
+    +email: String
+    +isActive: Boolean
+}
+
+@enduml

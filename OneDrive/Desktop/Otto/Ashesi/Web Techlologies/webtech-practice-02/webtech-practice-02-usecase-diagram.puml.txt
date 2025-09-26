@@ -1,0 +1,33 @@
+@startuml
+' Names: Athanase Abayo
+' Date: 21 Sept 2025
+' File: webtech-practice-02-usecase-diagram.puml
+' Description: Personalized Use Case diagram for Attendance System
+
+actor Student
+actor Lecturer
+actor Admin
+
+rectangle AttendanceSystem {
+    ' Student use cases
+    Student --> (Mark Attendance)
+    Student --> (View Attendance Record)
+    Student --> (Download Attendance Report)
+    Student --> (Reset Password)
+    Student --> (View / Update Profile)
+
+    ' Lecturer use cases
+    Lecturer --> (Take Attendance)
+    Lecturer --> (Generate Report)
+    Lecturer --> (Update Course Details)
+    Lecturer --> (Send Notifications)
+
+    ' Admin use cases
+    Admin --> (Manage Users)
+    Admin --> (Manage Courses)
+    Admin --> (Reset User Accounts)
+    Admin --> (Configure System Settings)
+    Admin --> (View System Logs)
+    Admin --> (Monitor Attendance Reports)
+}
+@enduml

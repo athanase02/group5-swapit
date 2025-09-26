@@ -1,0 +1,40 @@
+@startuml
+' Names: Athanase Abayo
+' Date: Sept 21 2025
+' File: webtech-practice-02-pageflow-diagram.puml
+' Description: Personalized Page Flow diagram for Attendance System
+
+class "Login Page"
+class "Forgot Password Page"
+class "Student Dashboard"
+class "Lecturer Dashboard"
+class "Admin Dashboard"
+class "Attendance Page"
+class "Reports Page"
+class "Profile Page"
+class "Download Report Page"
+class "Course Management Page"
+class "Notifications Page"
+class "User Management Page"
+class "System Settings Page"
+class "Audit Logs Page"
+
+"Login Page" --> "Student Dashboard" : student login
+"Login Page" --> "Lecturer Dashboard" : lecturer login
+"Login Page" --> "Admin Dashboard" : admin login
+"Login Page" --> "Forgot Password Page" : forgot password
+
+"Student Dashboard" --> "Attendance Page" : view attendance
+"Student Dashboard" --> "Profile Page" : update profile
+"Student Dashboard" --> "Download Report Page" : download PDF
+
+"Lecturer Dashboard" --> "Attendance Page" : take attendance
+"Lecturer Dashboard" --> "Reports Page" : generate reports
+"Lecturer Dashboard" --> "Course Management Page" : update courses
+"Lecturer Dashboard" --> "Notifications Page" : send messages
+
+"Admin Dashboard" --> "User Management Page"
+"Admin Dashboard" --> "Course Management Page"
+"Admin Dashboard" --> "System Settings Page"
+"Admin Dashboard" --> "Audit Logs Page"
+@enduml
