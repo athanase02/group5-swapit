@@ -1,0 +1,8 @@
+Database Diagram Description:
+
+USERS (user_id PK) -> ATTENDANCE (user_id FK)
+SESSIONS (session_id PK) -> ATTENDANCE (session_id FK)
+
+One-to-Many:
+- Each user can have multiple attendance records.
+- Each session can belong to multiple users.

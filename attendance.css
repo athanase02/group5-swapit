@@ -1,0 +1,154 @@
+/* === BASIC RESET: Ensures consistent styling across browsers === */
+* {
+  box-sizing: border-box; /* Include padding/border in element width/height */
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Clean, readable font */
+}
+
+/* === BACKGROUND VIDEO: Fullscreen and responsive === */
+#bgVideo {
+  position: fixed;       /* Stays in place even if page scrolls */
+  top: 0;
+  left: 0;
+  width: 100vw;          /* 100% of screen width */
+  height: 100vh;         /* 100% of screen height */
+  object-fit: cover;     /* Crops video to fill screen without stretching */
+  z-index: -1;           /* Places video behind all content */
+  background: #000;      /* Black fallback if video fails to load */
+}
+
+/* === PAGE LAYOUT: Centers all content vertically and horizontally === */
+body {
+  color: white;          /* Default text color (for footer, etc.) */
+  min-height: 100vh;     /* At least full screen height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+  align-items: center;     /* Center content horizontally */
+  padding: 16px;           /* Space around content on small screens */
+  position: relative;      /* Needed for z-index to work properly */
+}
+
+/* === MAIN CONTENT BOX (used for login, register, dashboards) === */
+.container {
+  max-width: 1220px;               /* Wider layout for large screens */
+  width: 100%;                     /* Fill available width */
+  background: rgba(237, 236, 241, 0.92); /* Light gray background with slight transparency */
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 12px;             /* Rounded corners */
+  padding: 24px;                   /* Inner spacing */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+  color: #333;                     /* Dark text for readability */
+  text-align: left;
+  position: relative;
+  z-index: 2;                      /* Appears above background video */
+}
+
+/* === HEADINGS: Ashesi red color and centered === */
+h1, h2 {
+  color: #c1272d;        /* Ashesi University red */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* === FORM LABELS === */
+label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: bold;
+  color: #444;
+}
+
+/* === INPUTS, SELECT MENUS, AND BUTTONS === */
+input,
+select,
+button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+/* === BUTTON STYLING === */
+button {
+  background-color: #c1272d; /* Ashesi red */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+button:hover {
+  background-color: #a01e24; /* Darker red on hover */
+}
+
+/* === HIDDEN ELEMENTS (controlled by JavaScript) === */
+.hidden {
+  display: none; /* Completely hide elements */
+}
+
+/* === ERROR MESSAGES === */
+.alert {
+  padding: 10px;
+  background-color: #fff5f5;      /* Light red background */
+  color: #c1272d;                 /* Ashesi red text */
+  border-left: 4px solid #c1272d; /* Red accent bar */
+  margin: 15px 0;
+  border-radius: 4px;
+}
+
+/* === DASHBOARD LAYOUT === */
+.dashboard {
+  text-align: center;
+  padding: 20px;
+}
+
+.dashboard h2 {
+  color: #c1272d;
+}
+
+.dashboard p {
+  margin: 10px 0;
+  font-size: 18px;
+  color: #444;
+}
+
+/* === FOOTER STYLING === */
+footer {
+  text-align: center;
+  margin-top: 30px;
+  color: white;
+  font-size: 14px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6); /* Improves readability over video */
+  position: relative;
+  z-index: 2;
+}
+
+/* === HELPER TEXT (e.g., under name field) === */
+.help-text {
+  font-size: 13px;
+  color: #777;
+  margin-top: -8px;
+  margin-bottom: 12px;
+}
+
+/* === MOBILE-FRIENDLY ADJUSTMENTS === */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+    margin: 0 8px; /* Prevents container from touching screen edges */
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  button {
+    padding: 14px;
+    font-size: 16px;
+  }
+}

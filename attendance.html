@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ashesi Attendance Portal</title>
+  <link rel="stylesheet" href="attendance.css" />
+</head>
+<body>
+
+  <!-- BACKGROUND VIDEO: Fullscreen, muted, loops automatically -->
+  <video autoplay muted loop id="bgVideo">
+    <source src="background.mp4" type="video/mp4">
+    <!-- Fallback message if browser doesn't support video -->
+    Your browser does not support HTML5 video.
+  </video>
+
+  <!-- STEP 1: Main screen - Choose Login or Register -->
+  <div id="authChoicePage" class="container">
+    <h1>Ashesi University</h1>
+    <p>How would you like to proceed?</p>
+    <button id="loginBtn">Login</button>
+    <button id="registerBtn">Register</button>
+  </div>
+
+  <!-- STEP 2: Registration Form -->
+  <div id="registerPage" class="container hidden">
+    <h2>Register – Ashesi University</h2>
+    <form id="registerForm">
+      <!-- Full Name Field -->
+      <label for="regName">Full Name</label>
+      <input type="text" id="regName" required aria-describedby="nameHelp" />
+      <div id="nameHelp" class="help-text">Enter your full name as it appears on official records.</div>
+
+      <!-- Email Field (HTML5 validation built-in) -->
+      <label for="regEmail">Email Address</label>
+      <input type="email" id="regEmail" required />
+
+      <!-- Password Field (min 8 characters) -->
+      <label for="regPassword">Password</label>
+      <input type="password" id="regPassword" minlength="8" required />
+
+      <!-- Role Selection -->
+      <label for="regRole">Role</label>
+      <select id="regRole" required>
+        <option value="">-- Select Role --</option>
+        <option value="student">Student</option>
+        <option value="faculty">Faculty</option>
+        <option value="intern">Intern</option>
+      </select>
+
+      <button type="submit">Register Account</button>
+      <button type="button" id="backToAuth">← Back</button>
+    </form>
+  </div>
+
+  <!-- STEP 3: Login Form -->
+  <div id="loginPage" class="container hidden">
+    <h2>Login – Ashesi University</h2>
+    <div class="paragraph">
+      <strong>Please enter your credentials:</strong><br/>
+    </div>
+    <form id="loginForm">
+      <label for="loginEmail">Email Address</label>
+      <input type="email" id="loginEmail" required />
+
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" required />
+
+      <!-- Error message area (hidden by default) -->
+      <div id="loginError" class="alert hidden" role="alert"></div>
+
+      <button type="submit">Login</button>
+      <button type="button" id="backToAuthFromLogin">← Back</button>
+    </form>
+  </div>
+
+  <!-- STEP 4: Role-Based Dashboards -->
+  <div id="studentDashboard" class="container hidden dashboard">
+    <h2>Student Dashboard</h2>
+    <p>Welcome, <span id="studentName"></span>!</p>
+    <p>You are logged in as a <strong>Student</strong>.</p>
+    <p>View your attendance records, submit excuses, and more.</p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div id="facultyDashboard" class="container hidden dashboard">
+    <h2>Faculty Dashboard</h2>
+    <p>Welcome, <span id="facultyName"></span>!</p>
+    <p>You are logged in as <strong>Faculty</strong>.</p>
+    <p>Mark attendance, view class reports, and manage sessions.</p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div id="internDashboard" class="container hidden dashboard">
+    <h2>Intern Dashboard</h2>
+    <p>Welcome, <span id="internName"></span>!</p>
+    <p>You are logged in as an <strong>Intern</strong>.</p>
+    <p>Assist with attendance tracking and system testing.</p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <footer>
+    Ashesi University Attendance Management System
+  </footer>
+
+  <!-- JAVASCRIPT: Handles all interactivity -->
+  <script>
+    /*
+      LEARNING GOAL: 
+      We are using JavaScript for client-side form validation and user flow control.
+      This aligns with W3Schools JavaScript tutorials (https://www.w3schools.com/js/).
+      We also simulate a database using a JavaScript array since we don't have a real backend.
+    */
+
+    // SIMULATED DATABASE (in a real system, this would come from a server/database)
+    // Each user object stores: email, password, full name, and role
+    let registeredUsers = [
+      {
+        email: "kgossafomaafo@ashesi.edu.gh",
+        password: "secure123",
+        name: "Kwame Gossan",
+        role: "student"
+      },
+      {
+        email: "dr.akyeampong@ashesi.edu.gh",
+        password: "facultyPass",
+        name: "Dr. Akyeampong",
+        role: "faculty"
+      }
+      // Note: New users (e.g., interns) will be added here during registration
+    ];
+
+    // Get references to key page sections
+    const authChoicePage = document.getElementById('authChoicePage');
+    const registerPage = document.getElementById('registerPage');
+    const loginPage = document.getElementById('loginPage');
+
+    // === NAVIGATION LOGIC ===
+    // Show login form when "Login" button is clicked
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      authChoicePage.classList.add('hidden');
+      loginPage.classList.remove('hidden');
+    });
+
+    // Show registration form when "Register" button is clicked
+    document.getElementById('registerBtn').addEventListener('click', () => {
+      authChoicePage.classList.add('hidden');
+      registerPage.classList.remove('hidden');
+    });
+
+    // Go back to main screen from registration
+    document.getElementById('backToAuth').addEventListener('click', () => {
+      registerPage.classList.add('hidden');
+      authChoicePage.classList.remove('hidden');
+    });
+
+    // Go back to main screen from login
+    document.getElementById('backToAuthFromLogin').addEventListener('click', () => {
+      loginPage.classList.add('hidden');
+      authChoicePage.classList.remove('hidden');
+    });
+
+    // === REGISTRATION FORM HANDLER ===
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent actual form submission (no backend)
+
+      // Get user input values
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const password = document.getElementById('regPassword').value;
+      const role = document.getElementById('regRole').value;
+
+      // Simple validation: check if email is already used
+      if (registeredUsers.some(user => user.email === email)) {
+        alert('This email is already registered!');
+        return; // Stop registration
+      }
+
+      // Add new user to simulated database
+      registeredUsers.push({ email, password, name, role });
+
+      // Show success message and return to main screen
+      alert('Registration successful! You can now log in.');
+      registerPage.classList.add('hidden');
+      authChoicePage.classList.remove('hidden');
+      this.reset(); // Clear the form
+    });
+
+    // === LOGIN FORM VALIDATION (inspired by W3Schools JS validation) ===
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent default form submit
+
+      // Get login credentials
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value;
+
+      // Find user in simulated database
+      const user = registeredUsers.find(u => u.email === email && u.password === password);
+
+      const errorDiv = document.getElementById('loginError');
+
+      // If no matching user, show error
+      if (!user) {
+        errorDiv.textContent = 'Invalid email or password.';
+        errorDiv.classList.remove('hidden'); // Make error visible
+        return;
+      }
+
+      // Clear error and hide login form
+      errorDiv.classList.add('hidden');
+      loginPage.classList.add('hidden');
+
+      // Show the correct dashboard based on user role
+      if (user.role === 'student') {
+        document.getElementById('studentName').textContent = user.name;
+        document.getElementById('studentDashboard').classList.remove('hidden');
+      } else if (user.role === 'faculty') {
+        document.getElementById('facultyName').textContent = user.name;
+        document.getElementById('facultyDashboard').classList.remove('hidden');
+      } else if (user.role === 'intern') {
+        document.getElementById('internName').textContent = user.name;
+        document.getElementById('internDashboard').classList.remove('hidden');
+      }
+    });
+
+    // === LOGOUT FUNCTION ===
+    function logout() {
+      // Hide all dashboards
+      document.querySelectorAll('.dashboard').forEach(d => d.classList.add('hidden'));
+      // Show main screen again
+      authChoicePage.classList.remove('hidden');
+      // Reset login form
+      document.getElementById('loginForm').reset();
+    }
+  </script>
+</body>
+</html>

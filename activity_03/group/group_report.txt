@@ -1,0 +1,15 @@
+Group Report - Activity 3.1
+
+Our group collaboratively developed the Attendance System using PHP and MySQL.
+Each member handled:
+    Database setup and testing
+    PHP scripting and CRUD functions
+    CSS design for mobile responsiveness
+    Documentation and deployment to server and GitHub
+
+Challenges:
+    Synchronizing SQL versions between local and server.
+    Testing mobile layout responsiveness.
+
+Outcome:
+    A fully functional attendance management dashboard meeting both the Student Association President’s and industry consultant’s requirements.

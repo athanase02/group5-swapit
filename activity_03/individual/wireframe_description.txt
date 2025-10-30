@@ -1,0 +1,6 @@
+Wireframe for Student Dashboard:
+- Login Page: Simple form with username and password fields.
+- Dashboard: 
+   - Header with “Welcome, [username]”.
+   - Table listing session date, course, type (lecture/lab), status, and comments.
+- Mobile view: Table stacks vertically, optimized for smaller screens.
