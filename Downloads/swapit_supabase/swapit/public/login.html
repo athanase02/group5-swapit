@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwapIt | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/auth.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-form form-container">
+            <div class="form-panel login-panel" id="loginPanel">
+                <div class="form-content">
+                    <h2>Login</h2>
+                    <form id="loginForm">
+                        <div class="input-group">
+                            <input type="email" id="loginEmail" required placeholder=" ">
+                            <label for="loginEmail">Email</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="loginPassword" required placeholder=" ">
+                            <label for="loginPassword">Password</label>
+                            <i class="icon-eye toggle-password" data-target="loginPassword"></i>
+                        </div>
+                        <a href="reset-password.html" class="forgot-password">Forgot Password?</a>
+                        <button type="submit" class="btn-primary">Login</button>
+                    </form>
+                    <p class="switch-text">
+                        Don’t have an account yet? 
+                        <a href="signup.html">Sign up</a>
+                    </p>
+                </div>
+                <div class="welcome-panel">
+                    <h1>Welcome Back to SwapIt</h1>
+                    <p>Continue sharing, lending, and borrowing seamlessly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.querySelector('.form-container').classList.add('loaded');
+
+            // ensure supabase is ready
+            if (typeof window.SUPABASE_READY !== 'undefined') {
+                const r = await window.SUPABASE_READY;
+                if (r?.error) console.warn('Supabase init error', r.error);
+            }
+
+            // Handle login form submission
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                try {
+                    const { data, error } = await window.supabase.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+
+                    if (error) throw error;
+
+                    // Redirect to dashboard on success
+                    window.location.href = 'dashboard.html';
+                } catch (error) {
+                    alert(error.message || error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

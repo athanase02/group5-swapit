@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile — SwapIt</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js" type="module"></script>
+</head>
+<body>
+  <div class="container" style="padding:28px">
+    <h1>Your profile</h1>
+    <div style="display:flex;gap:20px;align-items:center">
+      <img id="avatar" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop&crop=faces&sat=-20&ixlib=rb-4.0.3&s=placeholder" alt="avatar" style="width:120px;height:120px;border-radius:999px;object-fit:cover;border:2px solid #fff">
+      <div>
+        <p id="profileEmail">—</p>
+        <p id="profileName">—</p>
+        <div style="margin-top:8px">
+          <label class="btn">Choose Avatar <input id="avatarInput" type="file" accept="image/*" style="display:none"></label>
+          <button id="saveProfile" class="btn btn--primary">Save</button>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:18px">You can upload a profile photo which will be stored as a small data-URL in your profile row (requires a <code>profiles</code> table in Supabase).</p>
+    <div style="margin-top:20px">
+      <a href="dashboard.html" class="btn">Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      try {
+        if (typeof window.SUPABASE_READY !== 'undefined') {
+          const r = await window.SUPABASE_READY;
+          if (r?.error) throw r.error;
+        }
+
+        const { data } = await window.supabase.auth.getUser();
+        const user = data?.user;
+        if (!user) return window.location.href = 'login.html';
+
+        document.getElementById('profileEmail').textContent = user.email;
+
+        // Try load profile
+        try {
+          const { data: profiles } = await window.supabase.from('profiles').select('*').eq('id', user.id).limit(1).single();
+          if (profiles?.avatar_url) document.getElementById('avatar').src = profiles.avatar_url;
+          if (profiles?.full_name) document.getElementById('profileName').textContent = profiles.full_name;
+        } catch (e) {
+          // ignore missing table
+          console.warn('Profile fetch failed', e?.message || e);
+        }
+
+        let lastFile = null;
+        document.getElementById('avatarInput').addEventListener('change', (ev)=>{
+          const f = ev.target.files && ev.target.files[0];
+          if (!f) return;
+          lastFile = f;
+          // show a local preview immediately
+          const url = URL.createObjectURL(f);
+          document.getElementById('avatar').src = url;
+        });
+
+        document.getElementById('saveProfile').addEventListener('click', async ()=>{
+          if (!lastFile) return alert('Please choose an image first.');
+          try {
+            // upload to storage bucket 'public' using a path with user id and timestamp
+            const key = `avatars/${user.id}-${Date.now()}-${lastFile.name.replace(/[^a-zA-Z0-9_.-]/g,'')}`;
+
+            // Attempt upload
+            const uploadRes = await window.supabase.storage.from('public').upload(key, lastFile, { upsert: true });
+            if (uploadRes.error) throw uploadRes.error;
+
+            // Get public URL
+            const { data: urlData } = window.supabase.storage.from('public').getPublicUrl(key);
+            const publicUrl = urlData?.publicUrl || null;
+
+            if (!publicUrl) throw new Error('Could not get public URL for uploaded avatar.');
+
+            const payload = { avatar_url: publicUrl };
+            const { error } = await window.supabase.from('profiles').upsert({ id: user.id, ...payload });
+            if (error) throw error;
+            alert('Profile updated.');
+          } catch (err) {
+            console.warn(err);
+            // Fallback: try to save as data URL if upload fails
+            try {
+              const reader = new FileReader();
+              reader.onload = async ()=>{
+                const dataUrl = reader.result;
+                const { error } = await window.supabase.from('profiles').upsert({ id: user.id, avatar_url: dataUrl });
+                if (error) throw error;
+                alert('Profile updated (fallback to data URL).');
+              };
+              reader.readAsDataURL(lastFile);
+            } catch (e2) {
+              console.warn('fallback failed', e2);
+              alert('Could not update profile: ' + (err?.message || err));
+            }
+          }
+        });
+      } catch (err) {
+        console.warn(err);
+      }
+    });
+  </script>
+</body>
+</html>

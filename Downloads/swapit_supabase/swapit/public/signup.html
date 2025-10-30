@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwapIt | Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/auth.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-form form-container">
+            <div class="form-panel signup-panel" id="signupPanel">
+                <div class="welcome-panel">
+                    <h1>Join SwapIt</h1>
+                    <p>Be part of the community sharing smarter and living better.</p>
+                </div>
+                <div class="form-content">
+                    <h2>Sign Up</h2>
+                    <form id="signupForm">
+                        <div class="input-group">
+                            <input type="text" id="signupFullName" required placeholder=" ">
+                            <label for="signupFullName">Full Name</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" id="signupEmail" required placeholder=" ">
+                            <label for="signupEmail">Email</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="signupPassword" required placeholder=" ">
+                            <label for="signupPassword">Password</label>
+                            <i class="icon-eye toggle-password" data-target="signupPassword"></i>
+                        </div>
+                        <button type="submit" class="btn-primary">Create Account</button>
+                    </form>
+                    <p class="switch-text">
+                        Already part of SwapIt? 
+                        <a href="login.html">Login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.querySelector('.form-container').classList.add('loaded');
+
+            // ensure supabase is ready
+            if (typeof window.SUPABASE_READY !== 'undefined') {
+                const r = await window.SUPABASE_READY;
+                if (r?.error) console.warn('Supabase init error', r.error);
+            }
+
+            // Handle signup form submission
+            document.getElementById('signupForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const fullName = document.getElementById('signupFullName').value;
+
+                try {
+                    const { data: authData, error: authError } = await window.supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            data: {
+                                full_name: fullName
+                            }
+                        }
+                    });
+
+                    if (authError) throw authError;
+
+                    // Create user profile (best-effort; will fail if table missing)
+                    try {
+                        await window.supabase
+                            .from('profiles')
+                            .insert([
+                                {
+                                    id: authData.user?.id,
+                                    full_name: fullName,
+                                    email: email
+                                }
+                            ]);
+                    } catch (e) {
+                        // Ignore profile insert errors for now
+                        console.warn('Could not create profile row:', e?.message || e);
+                    }
+
+                    // After sign up, redirect user to login so they can sign in
+                    alert('Account created — please check your email for confirmation if required, then log in.');
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    alert(error.message || error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
