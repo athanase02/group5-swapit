@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwapIt | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/auth.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-form form-container">
+            <div class="form-panel login-panel" id="loginPanel">
+                <div class="form-content">
+                    <h2>Login</h2>
+                    <form id="loginForm">
+                        <div class="input-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" required placeholder=" ">
+                        </div>
+                        <div class="input-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" required placeholder=" ">
+                            <i class="icon-eye toggle-password" data-target="loginPassword"></i>
+                        </div>
+                        <a href="reset-password.html" class="forgot-password">Forgot Password?</a>
+                        <button type="submit" class="btn-primary">Login</button>
+                    </form>
+                    <p class="switch-text">
+                        Don’t have an account yet? 
+                        <a href="signup.html">Sign up</a>
+                    </p>
+                </div>
+                <div class="welcome-panel">
+                    <h1>Welcome Back to SwapIt</h1>
+                    <p>Continue sharing, lending, and borrowing seamlessly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.form-container').classList.add('loaded');
+            const loginForm = document.getElementById('loginForm');
+
+            // Handle login form submission
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                clearError('loginForm');
+                
+                const submitBtn = loginForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Logging in...';
+
+                try {
+                    const email = document.getElementById('loginEmail').value.trim();
+                    const password = document.getElementById('loginPassword').value;
+
+                    if (!email) {
+                        throw new Error('Please enter your email address');
+                    }
+
+                    const formData = new FormData();
+                    formData.append('action', 'login');
+                    formData.append('email', email);
+                    formData.append('password', password);
+
+                    const response = await fetch('../api/auth.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to log in');
+                    }
+
+                    window.location.href = 'dashboard.html';
+                } catch (error) {
+                    showError(error.message || 'Failed to log in. Please check your credentials.', 'loginForm');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cart — SwapIt</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js" type="module"></script>
+</head>
+<body>
+  <div class="container" style="padding:24px">
+    <h1>Your Cart</h1>
+    <div id="cartList"></div>
+
+    <div style="margin-top:18px">
+      <label>Pickup Date & Time <input id="pickupAt" type="datetime-local"></label>
+    </div>
+
+    <div style="margin-top:18px">
+      <button id="checkoutBtn" class="btn btn--primary">Checkout</button>
+      <a href="browse.html" class="btn">Continue browsing</a>
+    </div>
+  </div>
+
+  <script src="js/cart.js"></script>
+  <script>
+    document.getElementById('checkoutBtn').addEventListener('click', async ()=>{
+      if (typeof window.SUPABASE_READY !== 'undefined') {
+        const r = await window.SUPABASE_READY;
+        if (r?.error) console.warn('Supabase init error', r.error);
+      }
+      const pickup = document.getElementById('pickupAt').value;
+      const cart = JSON.parse(localStorage.getItem('swapit_cart')||'[]');
+      if (!cart.length) return alert('Your cart is empty');
+      if (!pickup) return alert('Please choose a pickup date/time');
+
+      try {
+        const { data } = await window.supabase.auth.getUser();
+        const user = data?.user;
+        if (!user) throw new Error('Not authenticated');
+
+        // Try to create an order record
+        const { error } = await window.supabase.from('orders').insert([{ user_id: user.id, items: cart, pickup_at: pickup }]);
+        if (error) throw error;
+        alert('Order created successfully.');
+        localStorage.removeItem('swapit_cart');
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        console.warn('order create failed', err?.message || err);
+        // fallback: save order locally
+        const orders = JSON.parse(localStorage.getItem('swapit_orders')||'[]');
+        orders.push({ id: 'local-'+Date.now(), items: cart, pickup_at: pickup });
+        localStorage.setItem('swapit_orders', JSON.stringify(orders));
+        localStorage.removeItem('swapit_cart');
+        alert('Could not save order to server. Saved locally in your browser.');
+        window.location.href = 'dashboard.html';
+      }
+    });
+  </script>
+</body>
+</html>
