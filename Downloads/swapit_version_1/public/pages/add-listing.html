@@ -1,0 +1,520 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Listing — SwapIt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <script src="../assets/js/auth-client.js"></script>
+  <script src="../assets/js/nav-manager.js"></script>
+  <style>
+    body {
+      background: #0a0b10;
+      min-height: 100vh;
+    }
+    .listing-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+    .listing-title {
+      font-size: 2rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 40px;
+      color: #fff;
+    }
+    .form-group {
+      margin-bottom: 24px;
+    }
+    .form-label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      color: #ecf1ff;
+    }
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      background: #fff;
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s;
+    }
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(126, 249, 255, 0.3);
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    .file-input-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 14px 16px;
+      background: #fff;
+      border: none;
+      border-radius: 8px;
+      color: #666;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .file-input-button:hover {
+      background: #f5f5f5;
+    }
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .file-name {
+      color: #999;
+      font-size: 0.9rem;
+    }
+    .form-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .btn-create {
+      flex: 1;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(126, 249, 255, 0.4);
+    }
+    .btn-create:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-cancel {
+      padding: 16px 32px;
+      background: transparent;
+      border: 2px solid #1e2434;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-cancel:hover {
+      border-color: #7ef9ff;
+      color: #7ef9ff;
+    }
+    .image-preview {
+      margin-top: 12px;
+      border-radius: 8px;
+      overflow: hidden;
+      display: none;
+    }
+    .image-preview img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+    }
+    .helper-text {
+      font-size: 0.85rem;
+      color: #9aa5c3;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header class="nav" id="siteHeader">
+    <div class="container nav__bar">
+      <a class="logo" href="home.html" style="display:flex;align-items:center;gap:8px">
+        <img src="../assets/images/logo.png" alt="SwapIt Logo" style="width:40px;height:40px;border-radius:50%;object-fit:cover">
+        <span><span>SWAP</span>IT</span>
+      </a>
+      <nav class="nav__menu">
+        <!-- Populated by nav-manager.js -->
+      </nav>
+      <div class="nav__cta">
+        <!-- Populated by nav-manager.js -->
+      </div>
+    </div>
+  </header>
+
+  <div class="listing-container">
+    <h1 class="listing-title">Create a new listing</h1>
+    
+    <form id="listingForm">
+      <div class="form-group">
+        <label class="form-label" for="title">Title</label>
+        <input 
+          type="text" 
+          id="title" 
+          class="form-input" 
+          placeholder="e.g., Canon DSLR Camera"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="description">Description</label>
+        <textarea 
+          id="description" 
+          class="form-textarea" 
+          placeholder="Describe your item's condition, features, and any important details..."
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="category">Category</label>
+        <select id="category" class="form-select" required>
+          <option value="">Select a category</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Books">Books</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Sports Equipment">Sports Equipment</option>
+          <option value="School Supplies">School Supplies</option>
+          <option value="Musical Instruments">Musical Instruments</option>
+          <option value="Art Supplies">Art Supplies</option>
+          <option value="Kitchen Items">Kitchen Items</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="price">Price (GHS/day)</label>
+        <input 
+          type="number" 
+          id="price" 
+          class="form-input" 
+          placeholder="50"
+          min="0"
+          step="0.01"
+          required
+        >
+        <p class="helper-text">Set a fair daily rental price for your item</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="location">Location</label>
+        <input 
+          type="text" 
+          id="location" 
+          class="form-input" 
+          placeholder="e.g., Ashesi University, Berekuso"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="imageInput">Image</label>
+        <div class="file-input-wrapper">
+          <button type="button" class="file-input-button" onclick="document.getElementById('imageInput').click()">
+            <span>Choose File</span>
+            <span class="file-name" id="fileName">No file chosen</span>
+          </button>
+          <input 
+            type="file" 
+            id="imageInput" 
+            accept="image/*"
+          >
+        </div>
+        <div class="image-preview" id="imagePreview">
+          <img id="previewImg" src="" alt="Preview">
+        </div>
+        <p class="helper-text">Upload a clear photo of your item (max 5MB)</p>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-create" id="submitBtn">Create listing</button>
+        <a href="dashboard.html" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <footer class="sitefoot">
+    <div class="container">
+      <div class="sitefoot__bottom">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          <img src="../assets/images/logo.png" alt="SwapIt Logo" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+          <small>SwapIt Ltd. &copy; All rights reserved <span id="year">2025</span></small>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Image preview functionality
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const fileName = document.getElementById('fileName');
+      const preview = document.getElementById('imagePreview');
+      const previewImg = document.getElementById('previewImg');
+
+      if (file) {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          showNotification('Image must be less than 5MB', 'error');
+          this.value = '';
+          fileName.textContent = 'No file chosen';
+          preview.style.display = 'none';
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          showNotification('Please select an image file', 'error');
+          this.value = '';
+          fileName.textContent = 'No file chosen';
+          preview.style.display = 'none';
+          return;
+        }
+
+        fileName.textContent = file.name;
+        
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImg.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        fileName.textContent = 'No file chosen';
+        preview.style.display = 'none';
+      }
+    });
+
+    // Form submission
+    document.getElementById('listingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
+
+      try {
+        // Check authentication
+        await window.swapitAuth.waitForReady();
+        if (!window.swapitAuth.isAuthenticated()) {
+          showNotification('Please login to create a listing', 'error');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+          return;
+        }
+
+        const user = window.swapitAuth.getUser();
+        
+        // Get form data
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const category = document.getElementById('category').value;
+        const price = parseFloat(document.getElementById('price').value);
+        const location = document.getElementById('location').value.trim();
+        const imageFile = document.getElementById('imageInput').files[0];
+
+        // Validate
+        if (!title || !description || !category || !location) {
+          showNotification('Please fill in all required fields', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          return;
+        }
+
+        if (isNaN(price) || price < 0) {
+          showNotification('Please enter a valid price', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          return;
+        }
+
+        // Convert image to base64 if provided
+        let imageData = null;
+        if (imageFile) {
+          try {
+            imageData = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(imageFile);
+            });
+          } catch (err) {
+            console.error('Image read error:', err);
+            showNotification('Failed to process image', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            return;
+          }
+        }
+
+        // Submit to backend
+        const formData = new FormData();
+        formData.append('action', 'create_listing');
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('category', category);
+        formData.append('price', price);
+        formData.append('location', location);
+        if (imageData) {
+          formData.append('image_url', imageData);
+        }
+
+        const response = await fetch('../../api/auth.php', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        });
+
+        const data = await response.json();
+        
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to create listing');
+        }
+
+        showNotification('Listing created successfully!', 'success');
+        
+        // Redirect after short delay
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1500);
+
+      } catch (err) {
+        console.error('Create listing error:', err);
+        showNotification('Failed to create listing. Please try again.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+
+    // Custom notification system
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existing = document.querySelector('.custom-notification');
+      if (existing) {
+        existing.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = 'custom-notification';
+      notification.style.cssText = `
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        background: ${type === 'success' ? 'linear-gradient(135deg, #4cff7e, #7ef9ff)' : type === 'error' ? 'linear-gradient(135deg, #ff4c60, #ff8c42)' : 'linear-gradient(135deg, #7ef9ff, #5b7cfe)'};
+        color: #000;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        max-width: 400px;
+      `;
+      notification.textContent = message;
+
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Check authentication on page load
+    async function checkAuth() {
+      if (window.swapitAuth) {
+        await window.swapitAuth.waitForReady();
+        if (!window.swapitAuth.isAuthenticated()) {
+          showNotification('Please login to create a listing', 'error');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+        }
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkAuth);
+    } else {
+      checkAuth();
+    }
+  </script>
+</body>
+</html>

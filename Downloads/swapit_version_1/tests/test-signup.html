@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Signup Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Test Signup & Database Connection</h1>
+
+        <div class="test-section">
+            <h3>1. Test Database Connection</h3>
+            <button onclick="testDbConnection()">Test DB Connection</button>
+            <div id="db-result" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Test Session Check</h3>
+            <button onclick="testSession()">Check Current Session</button>
+            <div id="session-result" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Test User Signup</h3>
+            <label>Full Name:</label>
+            <input type="text" id="testName" value="Test User">
+            
+            <label>Email:</label>
+            <input type="email" id="testEmail" value="test@example.com">
+            
+            <label>Password:</label>
+            <input type="password" id="testPassword" value="test123456">
+            
+            <button onclick="testSignup()">Test Signup</button>
+            <div id="signup-result" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Test Login with Demo User</h3>
+            <p>Email: demo@ashesi.edu.gh | Password: demo123</p>
+            <button onclick="testDemoLogin()">Test Demo Login</button>
+            <div id="login-result" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Test Logout</h3>
+            <button onclick="testLogout()">Test Logout</button>
+            <div id="logout-result" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testDbConnection() {
+            const resultDiv = document.getElementById('db-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Testing database connection...';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch('api/test.php');
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (data.success ? 'success' : 'error');
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function testSession() {
+            const resultDiv = document.getElementById('session-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking session...';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch('api/auth.php?action=check-session&t=' + Date.now(), {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (data.success ? 'success' : 'error');
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function testSignup() {
+            const resultDiv = document.getElementById('signup-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Creating account...';
+            resultDiv.className = 'result';
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'signup');
+                formData.append('email', document.getElementById('testEmail').value);
+                formData.append('password', document.getElementById('testPassword').value);
+                formData.append('full_name', document.getElementById('testName').value);
+
+                const response = await fetch('api/auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (data.success ? 'success' : 'error');
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function testDemoLogin() {
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Logging in...';
+            resultDiv.className = 'result';
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'login');
+                formData.append('email', 'demo@ashesi.edu.gh');
+                formData.append('password', 'demo123');
+
+                const response = await fetch('api/auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (data.success ? 'success' : 'error');
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function testLogout() {
+            const resultDiv = document.getElementById('logout-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Logging out...';
+            resultDiv.className = 'result';
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'logout');
+
+                const response = await fetch('api/auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (data.success ? 'success' : 'error');
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session Debug - SwapIt</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0a0b10;
+      color: #7ef9ff;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    h1 {
+      color: #7ef9ff;
+      margin-bottom: 20px;
+    }
+    
+    .section {
+      background: rgba(30, 36, 52, 0.5);
+      border: 1px solid #7ef9ff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .success {
+      color: #4cff7e;
+    }
+    
+    .error {
+      color: #ff4c60;
+    }
+    
+    .warning {
+      color: #ffb347;
+    }
+    
+    pre {
+      background: #000;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 5px;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(126, 249, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Session Debug Tool</h1>
+  
+  <div class="section">
+    <h2>Session Status</h2>
+    <div id="sessionStatus">Checking...</div>
+  </div>
+  
+  <div class="section">
+    <h2>Cookies</h2>
+    <pre id="cookiesDisplay"></pre>
+  </div>
+  
+  <div class="section">
+    <h2>Auth Client State</h2>
+    <pre id="authClientState"></pre>
+  </div>
+  
+  <div class="section">
+    <h2>Server Response</h2>
+    <pre id="serverResponse"></pre>
+  </div>
+  
+  <div class="section">
+    <h2>Console Logs</h2>
+    <pre id="consoleLogs"></pre>
+  </div>
+  
+  <div class="section">
+    <h2>Actions</h2>
+    <button onclick="checkSession()">Check Session</button>
+    <button onclick="viewCookies()">View Cookies</button>
+    <button onclick="testAPI()">Test API Direct</button>
+    <button onclick="clearAndReload()">Clear & Reload</button>
+    <button onclick="window.location.href='login.html'">Go to Login</button>
+    <button onclick="window.location.href='profile.html'">Go to Profile</button>
+  </div>
+
+  <script src="../assets/js/auth-client.js"></script>
+  <script>
+    // Capture console logs
+    const logs = [];
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+    
+    console.log = function(...args) {
+      logs.push('[LOG] ' + args.join(' '));
+      updateConsoleLogs();
+      originalLog.apply(console, args);
+    };
+    
+    console.error = function(...args) {
+      logs.push('[ERROR] ' + args.join(' '));
+      updateConsoleLogs();
+      originalError.apply(console, args);
+    };
+    
+    console.warn = function(...args) {
+      logs.push('[WARN] ' + args.join(' '));
+      updateConsoleLogs();
+      originalWarn.apply(console, args);
+    };
+    
+    function updateConsoleLogs() {
+      document.getElementById('consoleLogs').textContent = logs.join('\n');
+    }
+    
+    async function checkSession() {
+      console.log('=== Manual Session Check ===');
+      
+      try {
+        if (!window.swapitAuth) {
+          console.error('Auth client not loaded!');
+          return;
+        }
+        
+        await window.swapitAuth.waitForReady();
+        console.log('Auth client ready');
+        
+        const sessionData = await window.swapitAuth.checkSession();
+        console.log('Session data:', JSON.stringify(sessionData, null, 2));
+        
+        const user = window.swapitAuth.getUser();
+        console.log('Current user:', JSON.stringify(user, null, 2));
+        
+        const isAuth = window.swapitAuth.isAuthenticated();
+        console.log('Is authenticated:', isAuth);
+        
+        // Update display
+        const statusDiv = document.getElementById('sessionStatus');
+        if (isAuth && user) {
+          statusDiv.innerHTML = `
+            <div class="success">✅ AUTHENTICATED</div>
+            <div>Email: ${user.email}</div>
+            <div>Name: ${user.full_name}</div>
+            <div>User ID: ${user.user_id}</div>
+            <div>Session ID: ${user.session_id || 'N/A'}</div>
+          `;
+        } else {
+          statusDiv.innerHTML = '<div class="error">❌ NOT AUTHENTICATED</div>';
+        }
+        
+        // Show auth client state
+        document.getElementById('authClientState').textContent = JSON.stringify({
+          ready: window.swapitAuth.ready,
+          user: window.swapitAuth.user,
+          sessionCheckInterval: window.swapitAuth.sessionCheckInterval ? 'Active' : 'Inactive'
+        }, null, 2);
+        
+      } catch (err) {
+        console.error('Check session error:', err);
+        document.getElementById('sessionStatus').innerHTML = 
+          `<div class="error">ERROR: ${err.message}</div>`;
+      }
+    }
+    
+    function viewCookies() {
+      console.log('=== Cookies ===');
+      const cookies = document.cookie;
+      console.log('All cookies:', cookies);
+      
+      document.getElementById('cookiesDisplay').textContent = cookies || 'No cookies found';
+    }
+    
+    async function testAPI() {
+      console.log('=== Testing API Directly ===');
+      
+      try {
+        const response = await fetch('../../api/auth.php?action=check-session&t=' + Date.now(), {
+          method: 'GET',
+          credentials: 'include',
+          cache: 'no-cache',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', [...response.headers.entries()]);
+        
+        const text = await response.text();
+        console.log('Response text:', text);
+        
+        try {
+          const data = JSON.parse(text);
+          console.log('Parsed data:', JSON.stringify(data, null, 2));
+          
+          document.getElementById('serverResponse').textContent = JSON.stringify(data, null, 2);
+        } catch (e) {
+          console.error('Failed to parse JSON:', e);
+          document.getElementById('serverResponse').textContent = 'Not JSON: ' + text;
+        }
+        
+      } catch (err) {
+        console.error('API test error:', err);
+        document.getElementById('serverResponse').textContent = 'ERROR: ' + err.message;
+      }
+    }
+    
+    function clearAndReload() {
+      console.log('=== Clearing everything ===');
+      localStorage.clear();
+      sessionStorage.clear();
+      // Clear cookies
+      document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      });
+      setTimeout(() => {
+        location.reload();
+      }, 500);
+    }
+    
+    // Auto-run on load
+    window.addEventListener('DOMContentLoaded', async () => {
+      console.log('=== Debug Page Loaded ===');
+      console.log('Current URL:', window.location.href);
+      console.log('User agent:', navigator.userAgent);
+      
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for auth client
+      
+      checkSession();
+      viewCookies();
+      testAPI();
+    });
+  </script>
+</body>
+</html>

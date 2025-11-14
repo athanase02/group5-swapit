@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwapIt | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/auth.css">
+    <!-- Google Sign-In API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Left Side - Hero with Background Image -->
+        <div class="auth-hero hero-login">
+            <a href="home.html" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M12.5 5L7.5 10L12.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Back to website
+            </a>
+            
+            <div class="hero-content">
+                <img src="../assets/images/logo.png" alt="SwapIt Logo" class="hero-logo">
+                <h1 class="hero-title">Welcome Back</h1>
+                <p class="hero-subtitle">Continue sharing, lending, and borrowing seamlessly within your community.</p>
+            </div>
+
+            <div class="hero-dots">
+                <span class="dot"></span>
+                <span class="dot active"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
+        <!-- Right Side - Dark Form -->
+        <div class="auth-form-section">
+            <div class="form-wrapper">
+                <h2 class="form-title">Log in to SwapIt</h2>
+                <p class="form-subtitle">Don't have an account? <a href="signup.html" class="link">Sign up</a></p>
+                
+                <form id="loginForm" class="auth-form">
+                    <div class="input-group">
+                        <input type="email" id="loginEmail" required placeholder="Email">
+                    </div>
+                    
+                    <div class="input-group password-group">
+                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                        <button type="button" class="password-toggle" data-target="loginPassword">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="eye-icon">
+                                <path d="M10 7C8.34315 7 7 8.34315 7 10C7 11.6569 8.34315 13 10 13C11.6569 13 13 11.6569 13 10C13 8.34315 11.6569 7 10 7Z" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M10 4C5 4 2 10 2 10C2 10 5 16 10 16C15 16 18 10 18 10C18 10 15 4 10 4Z" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="form-options">
+                        <a href="reset-password.html" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Log in</button>
+                </form>
+
+                <div class="form-divider">Or continue with</div>
+
+                <div class="social-buttons">
+                    <!-- Google Sign-In Button -->
+                    <div id="googleSignInButton" class="btn-social google-signin-btn">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        <span>Google</span>
+                    </div>
+                    <button class="btn-social" type="button" disabled style="opacity: 0.5; cursor: not-allowed;" title="Coming soon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                        </svg>
+                        <span>Apple</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Google OAuth Configuration -->
+    <script>
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-icon">
+                        ${type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '⚠' : 'ℹ'}
+                    </span>
+                    <span class="notification-message">${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Trigger animation
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+        
+        // Google OAuth Configuration
+        const GOOGLE_CLIENT_ID = '192017179678-h09621pfp20m4c68idini6j4nattsgqk.apps.googleusercontent.com';
+        
+        // Initialize Google Sign-In
+        window.onload = function() {
+            if (typeof google !== 'undefined' && google.accounts) {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleGoogleCallback,
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
+                
+                google.accounts.id.renderButton(
+                    document.getElementById('googleSignInButton'),
+                    {
+                        theme: 'filled_blue',
+                        size: 'large',
+                        type: 'standard',
+                        shape: 'rectangular',
+                        text: 'signin_with',
+                        width: '100%'
+                    }
+                );
+            } else {
+                document.getElementById('googleSignInButton').addEventListener('click', function() {
+                    showNotification('Google Sign-In is being configured. Please use email login for now.', 'warning');
+                });
+            }
+        };
+        
+        async function handleGoogleCallback(response) {
+            try {
+                console.log('Google Sign-In response:', response);
+                
+                // Show loading notification
+                showNotification('Signing in with Google...', 'info');
+                
+                const formData = new FormData();
+                formData.append('action', 'google_signin');
+                formData.append('credential', response.credential);
+                
+                const result = await fetch('../../api/auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                
+                const data = await result.json();
+                
+                if (data.success) {
+                    showNotification('✓ Successfully signed in! Redirecting to dashboard...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    showNotification(data.message || 'Google Sign-In failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Google Sign-In error:', error);
+                showNotification('Failed to sign in with Google. Please try again.', 'error');
+            }
+        }
+    </script>
+
+    <script src="../assets/js/auth-client.js"></script>
+    <script src="../assets/js/login.js"></script>
+</body>
+</html>

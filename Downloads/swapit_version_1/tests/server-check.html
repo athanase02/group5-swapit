@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .check-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="check-container">
+        <h1>🔍 SwapIt Server Diagnostics</h1>
+        
+        <div class="test-section">
+            <h3>Current Page URL</h3>
+            <div id="currentUrl" class="info"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>1. Test API Endpoint</h3>
+            <button onclick="testAPI()">Test API Connection</button>
+            <div id="apiResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Test Database Connection</h3>
+            <button onclick="testDatabase()">Test Database</button>
+            <div id="dbResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Test Auth Client</h3>
+            <button onclick="testAuthClient()">Test Auth Client</button>
+            <div id="authResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Quick Fix Instructions</h3>
+            <div class="warning">
+                <strong>If you see "Failed to fetch" errors:</strong>
+                <ol>
+                    <li><strong>Check if you're using file:// protocol</strong>
+                        <ul>
+                            <li>❌ BAD: file:///C:/Users/...</li>
+                            <li>✅ GOOD: http://localhost:8000/...</li>
+                        </ul>
+                    </li>
+                    <li><strong>Start a web server:</strong>
+                        <ul>
+                            <li><strong>Option A (PHP):</strong> Run in PowerShell:<br>
+                                <code>cd "C:\Users\Athanase\Downloads\swapit_version_1"</code><br>
+                                <code>php -S localhost:8000 -t public</code><br>
+                                Then access: <code>http://localhost:8000/server-check.html</code>
+                            </li>
+                            <li><strong>Option B (XAMPP):</strong>
+                                <ul>
+                                    <li>Start Apache in XAMPP Control Panel</li>
+                                    <li>Copy project to C:\xampp\htdocs\swapit</li>
+                                    <li>Access: <code>http://localhost/swapit/public/server-check.html</code></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Verify MySQL is running</strong> in XAMPP Control Panel</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Display current URL
+        document.getElementById('currentUrl').innerHTML = `
+            <strong>Protocol:</strong> ${window.location.protocol}<br>
+            <strong>Full URL:</strong> ${window.location.href}<br>
+            <strong>Status:</strong> ${window.location.protocol === 'file:' ? 
+                '<span style="color: red;">❌ Using file:// - APIs will NOT work!</span>' : 
+                '<span style="color: green;">✅ Using ' + window.location.protocol + '</span>'}
+        `;
+
+        async function testAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<div class="info">Testing API endpoint...</div>';
+
+            try {
+                const testUrl = '../api/test.php';
+                console.log('Testing URL:', testUrl);
+                
+                const response = await fetch(testUrl, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="status success">
+                            ✅ API Connection Successful!
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status error">
+                            ⚠️ API responded but with error:
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('API test error:', error);
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Failed to connect to API<br>
+                        <strong>Error:</strong> ${error.message}<br>
+                        <strong>Solution:</strong> Make sure web server is running!
+                    </div>
+                `;
+            }
+        }
+
+        async function testDatabase() {
+            const resultDiv = document.getElementById('dbResult');
+            resultDiv.innerHTML = '<div class="info">Testing database connection...</div>';
+
+            try {
+                const response = await fetch('../api/test.php', {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="status success">
+                            ✅ Database Connected!<br>
+                            <strong>Database:</strong> ${data.database}<br>
+                            <strong>Users:</strong> ${data.user_count}<br>
+                            <strong>PHP Version:</strong> ${data.php_version}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status error">
+                            ❌ Database Connection Failed<br>
+                            ${data.message}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Cannot reach database endpoint<br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function testAuthClient() {
+            const resultDiv = document.getElementById('authResult');
+            resultDiv.innerHTML = '<div class="info">Testing auth client...</div>';
+
+            try {
+                // Load auth client dynamically
+                const script = document.createElement('script');
+                script.src = '../assets/js/auth-client.js';
+                
+                script.onload = async () => {
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Wait for init
+                    
+                    if (window.swapitAuth) {
+                        const user = window.swapitAuth.getUser();
+                        resultDiv.innerHTML = `
+                            <div class="status success">
+                                ✅ Auth Client Loaded<br>
+                                <strong>Ready:</strong> ${window.swapitAuth.ready}<br>
+                                <strong>Authenticated:</strong> ${window.swapitAuth.isAuthenticated()}<br>
+                                <strong>Current User:</strong> ${user ? user.email : 'None'}
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="status error">
+                                ❌ Auth client not initialized
+                            </div>
+                        `;
+                    }
+                };
+
+                script.onerror = () => {
+                    resultDiv.innerHTML = `
+                        <div class="status error">
+                            ❌ Failed to load auth-client.js
+                        </div>
+                    `;
+                };
+
+                document.head.appendChild(script);
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Auth client test failed: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run basic checks on load
+        window.addEventListener('load', () => {
+            if (window.location.protocol !== 'file:') {
+                setTimeout(testAPI, 500);
+            }
+        });
+    </script>
+</body>
+</html>
