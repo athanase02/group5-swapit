@@ -1,7 +1,8 @@
 -- Drop database if exists and create new one
-DROP DATABASE IF EXISTS swapit_db;
-CREATE DATABASE swapit_db;
-USE swapit_db;
+-- Database name: SI2025 (SwapIt 2025)
+DROP DATABASE IF EXISTS SI2025;
+CREATE DATABASE SI2025;
+USE SI2025;
 
 -- Users table for authentication
 CREATE TABLE users (
@@ -122,3 +123,12 @@ INSERT INTO categories (name, description) VALUES
 ('Art Supplies', 'Paint, canvas, and other art materials'),
 ('Kitchen Items', 'Utensils, appliances, and cookware'),
 ('Other', 'Miscellaneous items');
+
+-- Insert demo user
+-- Password: demo123 (hashed using password_hash() with PASSWORD_DEFAULT)
+INSERT INTO users (email, password_hash, full_name, is_verified) VALUES
+('demo@ashesi.edu.gh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Demo User', TRUE);
+
+-- Insert profile for demo user
+INSERT INTO profiles (user_id, full_name, email, phone, bio, avatar_url) VALUES
+(1, 'Demo User', 'demo@ashesi.edu.gh', '+233501234567', 'This is a demo user account for testing SwapIt platform features.', 'https://ui-avatars.com/api/?name=Demo+User&size=200');

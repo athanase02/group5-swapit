@@ -1,9 +1,10 @@
 <?php
 // Database configuration
+// Database name: SI2025 (SwapIt 2025)
 $host = "localhost";
 $username = "root"; // your MySQL username
-$password = "Otto@2023!!!"; // your MySQL password
-$database = "swapit_db";
+$password = ""; // your MySQL password
+$database = "SI2025";
 
 // Create connection
 $conn = new mysqli($host, $username, $password, $database);

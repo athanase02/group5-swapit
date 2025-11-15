@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session Test - SwapIt</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0a0b10 0%, #1a1b20 100%);
+      color: #fff;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .status-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(126, 249, 255, 0.2);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .status-row:last-child {
+      border-bottom: none;
+    }
+    
+    .status-label {
+      color: #7ef9ff;
+      font-weight: 600;
+    }
+    
+    .status-value {
+      font-family: 'Courier New', monospace;
+      color: #fff;
+    }
+    
+    .success {
+      color: #4cff7e;
+    }
+    
+    .error {
+      color: #ff4c60;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px 10px 10px 0;
+      transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .log {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(126, 249, 255, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    
+    .log-entry {
+      margin-bottom: 8px;
+    }
+    
+    .log-time {
+      color: #7ef9ff;
+    }
+    
+    .log-message {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Session Persistence Test</h1>
+    
+    <div class="status-card">
+      <h2 style="margin-bottom: 16px; font-size: 1.2rem;">Session Status</h2>
+      
+      <div class="status-row">
+        <span class="status-label">Authenticated:</span>
+        <span class="status-value" id="authStatus">Checking...</span>
+      </div>
+      
+      <div class="status-row">
+        <span class="status-label">User Email:</span>
+        <span class="status-value" id="userEmail">-</span>
+      </div>
+      
+      <div class="status-row">
+        <span class="status-label">User Name:</span>
+        <span class="status-value" id="userName">-</span>
+      </div>
+      
+      <div class="status-row">
+        <span class="status-label">Session ID:</span>
+        <span class="status-value" id="sessionId">-</span>
+      </div>
+      
+      <div class="status-row">
+        <span class="status-label">Last Check:</span>
+        <span class="status-value" id="lastCheck">-</span>
+      </div>
+      
+      <div class="status-row">
+        <span class="status-label">Auto-Refresh:</span>
+        <span class="status-value" id="autoRefresh">Enabled (5 min)</span>
+      </div>
+    </div>
+    
+    <div class="status-card">
+      <h2 style="margin-bottom: 16px; font-size: 1.2rem;">Test Actions</h2>
+      
+      <button class="btn" onclick="checkSession()">🔄 Check Session Now</button>
+      <button class="btn" onclick="simulateProfileEdit()">✏️ Simulate Profile Edit</button>
+      <button class="btn" onclick="clearLog()">🗑️ Clear Log</button>
+      <button class="btn" onclick="window.location.href='dashboard.html'">📊 Go to Dashboard</button>
+    </div>
+    
+    <div class="status-card">
+      <h2 style="margin-bottom: 16px; font-size: 1.2rem;">Activity Log</h2>
+      <div class="log" id="activityLog"></div>
+    </div>
+  </div>
+
+  <script src="../assets/js/auth-client.js"></script>
+  <script>
+    const log = document.getElementById('activityLog');
+    
+    function addLog(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      const time = new Date().toLocaleTimeString();
+      const color = type === 'success' ? '#4cff7e' : type === 'error' ? '#ff4c60' : '#7ef9ff';
+      entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-message" style="color: ${color}">${message}</span>`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+    
+    function clearLog() {
+      log.innerHTML = '';
+      addLog('Log cleared', 'info');
+    }
+    
+    async function checkSession() {
+      addLog('Checking session...', 'info');
+      
+      try {
+        const userData = await window.swapitAuth.checkSession();
+        const now = new Date().toLocaleTimeString();
+        
+        document.getElementById('lastCheck').textContent = now;
+        
+        if (userData) {
+          document.getElementById('authStatus').textContent = '✅ Active';
+          document.getElementById('authStatus').className = 'status-value success';
+          document.getElementById('userEmail').textContent = userData.email || '-';
+          document.getElementById('userName').textContent = userData.full_name || '-';
+          document.getElementById('sessionId').textContent = userData.session_id || '-';
+          
+          addLog(`Session active: ${userData.email} (${userData.full_name})`, 'success');
+        } else {
+          document.getElementById('authStatus').textContent = '❌ Not Logged In';
+          document.getElementById('authStatus').className = 'status-value error';
+          document.getElementById('userEmail').textContent = '-';
+          document.getElementById('userName').textContent = '-';
+          document.getElementById('sessionId').textContent = '-';
+          
+          addLog('Session not active - please login', 'error');
+        }
+      } catch (err) {
+        addLog('Session check failed: ' + err.message, 'error');
+      }
+    }
+    
+    async function simulateProfileEdit() {
+      addLog('Simulating profile edit...', 'info');
+      
+      try {
+        const currentUser = window.swapitAuth.getUser();
+        if (!currentUser) {
+          addLog('Not logged in - cannot edit profile', 'error');
+          return;
+        }
+        
+        // Make a dummy profile update
+        const result = await window.swapitAuth.updateProfile({
+          phone: currentUser.phone || '000-000-0000',
+          location: currentUser.location || 'Test Location'
+        });
+        
+        if (result.success) {
+          addLog('Profile edit successful - session should persist', 'success');
+          
+          // Check session immediately after edit
+          setTimeout(async () => {
+            addLog('Verifying session after profile edit...', 'info');
+            await checkSession();
+          }, 1000);
+        } else {
+          addLog('Profile edit failed: ' + result.message, 'error');
+        }
+      } catch (err) {
+        addLog('Profile edit error: ' + err.message, 'error');
+      }
+    }
+    
+    // Initial check when page loads
+    window.addEventListener('DOMContentLoaded', async () => {
+      addLog('Session test page loaded', 'info');
+      addLog('Waiting for auth client to initialize...', 'info');
+      
+      await window.swapitAuth.waitForReady();
+      addLog('Auth client ready', 'success');
+      
+      await checkSession();
+      
+      // Log the auto-refresh status
+      if (window.swapitAuth.sessionCheckInterval) {
+        addLog('Auto-refresh mechanism is active (5 min intervals)', 'success');
+      }
+    });
+  </script>
+</body>
+</html>

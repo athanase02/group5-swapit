@@ -1,0 +1,379 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Requests — SwapIt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <script src="../assets/js/auth-client.js"></script>
+  <script src="../assets/js/nav-manager.js"></script>
+  <style>
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #1e2434;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: #9aa5c3;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+    .tab-btn.active {
+      color: #7ef9ff;
+      border-bottom-color: #7ef9ff;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .request-card {
+      background: linear-gradient(180deg, #151824, #0f1118);
+      border: 1px solid #1e2434;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .request-card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .request-info {
+      flex: 1;
+    }
+    .request-status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .status-pending {
+      background: rgba(255, 193, 7, 0.1);
+      color: #ffc107;
+    }
+    .status-approved {
+      background: rgba(126, 249, 255, 0.1);
+      color: #7ef9ff;
+    }
+    .status-rejected {
+      background: rgba(255, 76, 96, 0.1);
+      color: #ff4c60;
+    }
+    .status-completed {
+      background: rgba(76, 255, 126, 0.1);
+      color: #4cff7e;
+    }
+    .request-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <header class="nav" id="siteHeader">
+    <div class="container nav__bar">
+      <a class="logo" href="home.html" style="display:flex;align-items:center;gap:8px">
+        <img src="../assets/images/logo.png" alt="SwapIt Logo" style="width:40px;height:40px;border-radius:50%;object-fit:cover">
+        <span><span>SWAP</span>IT</span>
+      </a>
+      <nav class="nav__menu">
+        <!-- Populated by nav-manager.js -->
+      </nav>
+      <div class="nav__cta">
+        <!-- Populated by nav-manager.js -->
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container" style="max-width: 1200px;">
+      <h1 style="margin-bottom: 1rem;">My Requests</h1>
+      <p style="color: #9aa5c3; margin-bottom: 2rem;">Manage incoming and outgoing swap requests</p>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('incoming')">
+          <i class="fas fa-inbox"></i> Incoming (3)
+        </button>
+        <button class="tab-btn" onclick="switchTab('outgoing')">
+          <i class="fas fa-paper-plane"></i> Outgoing (2)
+        </button>
+        <button class="tab-btn" onclick="switchTab('history')">
+          <i class="fas fa-history"></i> History (5)
+        </button>
+      </div>
+
+      <!-- Incoming Requests Tab -->
+      <div id="incoming-tab" class="tab-content active">
+        <div class="request-card">
+          <img src="../assets/images/calculator.jpg" alt="Calculator" onerror="this.src='../assets/images/logo.png'">
+          <div class="request-info">
+            <h3 style="margin-bottom: 8px;">Request for Scientific Calculator</h3>
+            <p style="color: #9aa5c3; margin-bottom: 8px;">Someone wants to borrow your scientific calculator</p>
+            <div class="user-info">
+              <img src="../assets/images/default-avatar.png" alt="User" class="user-avatar">
+              <div>
+                <p style="font-weight: 600;">Sarah Mitchell</p>
+                <p style="color: #9aa5c3; font-size: 0.875rem;">Requested 2 hours ago</p>
+              </div>
+            </div>
+            <div style="margin-top: 12px;">
+              <p style="font-size: 0.9rem;"><strong>Pickup:</strong> Tomorrow at 2:00 PM</p>
+              <p style="font-size: 0.9rem; color: #9aa5c3;">Duration: 3 days</p>
+            </div>
+            <span class="request-status status-pending">Pending</span>
+          </div>
+          <div class="request-actions">
+            <button class="btn btn--primary" onclick="approveRequest(1)">
+              <i class="fas fa-check"></i> Approve
+            </button>
+            <button class="btn btn--outline" onclick="rejectRequest(1)">
+              <i class="fas fa-times"></i> Deny
+            </button>
+          </div>
+        </div>
+
+        <div class="request-card">
+          <img src="../assets/images/projector ashesi.jpg" alt="Projector">
+          <div class="request-info">
+            <h3 style="margin-bottom: 8px;">Request for HD Projector</h3>
+            <p style="color: #9aa5c3; margin-bottom: 8px;">Someone wants to borrow your classroom projector</p>
+            <div class="user-info">
+              <img src="../assets/images/default-avatar.png" alt="User" class="user-avatar">
+              <div>
+                <p style="font-weight: 600;">Michael Chen</p>
+                <p style="color: #9aa5c3; font-size: 0.875rem;">Requested 5 hours ago</p>
+              </div>
+            </div>
+            <div style="margin-top: 12px;">
+              <p style="font-size: 0.9rem;"><strong>Pickup:</strong> Friday at 10:00 AM</p>
+              <p style="font-size: 0.9rem; color: #9aa5c3;">Duration: 2 days</p>
+            </div>
+            <span class="request-status status-pending">Pending</span>
+          </div>
+          <div class="request-actions">
+            <button class="btn btn--primary" onclick="approveRequest(2)">
+              <i class="fas fa-check"></i> Approve
+            </button>
+            <button class="btn btn--outline" onclick="rejectRequest(2)">
+              <i class="fas fa-times"></i> Deny
+            </button>
+          </div>
+        </div>
+
+        <div class="request-card">
+          <img src="../assets/images/bicycle.jpeg" alt="Bicycle">
+          <div class="request-info">
+            <h3 style="margin-bottom: 8px;">Request for Campus Bicycle</h3>
+            <p style="color: #9aa5c3; margin-bottom: 8px;">Someone wants to borrow your bicycle</p>
+            <div class="user-info">
+              <img src="../assets/images/default-avatar.png" alt="User" class="user-avatar">
+              <div>
+                <p style="font-weight: 600;">Emma Davis</p>
+                <p style="color: #9aa5c3; font-size: 0.875rem;">Requested 1 day ago</p>
+              </div>
+            </div>
+            <div style="margin-top: 12px;">
+              <p style="font-size: 0.9rem;"><strong>Pickup:</strong> Today at 4:00 PM</p>
+              <p style="font-size: 0.9rem; color: #9aa5c3;">Duration: 1 day</p>
+            </div>
+            <span class="request-status status-pending">Pending</span>
+          </div>
+          <div class="request-actions">
+            <button class="btn btn--primary" onclick="approveRequest(3)">
+              <i class="fas fa-check"></i> Approve
+            </button>
+            <button class="btn btn--outline" onclick="rejectRequest(3)">
+              <i class="fas fa-times"></i> Deny
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outgoing Requests Tab -->
+      <div id="outgoing-tab" class="tab-content">
+        <div class="request-card">
+          <img src="../assets/images/logo.png" alt="Item">
+          <div class="request-info">
+            <h3 style="margin-bottom: 8px;">Textbook: Data Structures</h3>
+            <p style="color: #9aa5c3; margin-bottom: 8px;">Your request to borrow this textbook</p>
+            <div class="user-info">
+              <img src="../assets/images/default-avatar.png" alt="Owner" class="user-avatar">
+              <div>
+                <p style="font-weight: 600;">John Smith (Owner)</p>
+                <p style="color: #9aa5c3; font-size: 0.875rem;">Requested 3 hours ago</p>
+              </div>
+            </div>
+            <div style="margin-top: 12px;">
+              <p style="font-size: 0.9rem;"><strong>Pickup:</strong> Monday at 11:00 AM</p>
+              <p style="font-size: 0.9rem; color: #9aa5c3;">Duration: 1 week</p>
+            </div>
+            <span class="request-status status-pending">Awaiting Response</span>
+          </div>
+          <div class="request-actions">
+            <button class="btn btn--outline" onclick="cancelRequest(1)">
+              <i class="fas fa-ban"></i> Cancel Request
+            </button>
+          </div>
+        </div>
+
+        <div class="request-card">
+          <img src="../assets/images/logo.png" alt="Item">
+          <div class="request-info">
+            <h3 style="margin-bottom: 8px;">Laptop Stand</h3>
+            <p style="color: #9aa5c3; margin-bottom: 8px;">Your request to borrow this laptop stand</p>
+            <div class="user-info">
+              <img src="../assets/images/default-avatar.png" alt="Owner" class="user-avatar">
+              <div>
+                <p style="font-weight: 600;">Alice Johnson (Owner)</p>
+                <p style="color: #9aa5c3; font-size: 0.875rem;">Requested 1 day ago</p>
+              </div>
+            </div>
+            <div style="margin-top: 12px;">
+              <p style="font-size: 0.9rem;"><strong>Pickup:</strong> Wednesday at 3:00 PM</p>
+              <p style="font-size: 0.9rem; color: #9aa5c3;">Duration: 5 days</p>
+            </div>
+            <span class="request-status status-approved">Approved!</span>
+          </div>
+          <div class="request-actions">
+            <button class="btn btn--primary" onclick="viewDetails(2)">
+              <i class="fas fa-eye"></i> View Details
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div id="history-tab" class="tab-content">
+        <div class="request-card">
+          <img src="../assets/images/logo.png" alt="Item">
+          <div class="request-info">
+            <h3 style="margin-bottom: 8px;">Gaming Mouse</h3>
+            <p style="color: #9aa5c3; margin-bottom: 8px;">Borrowed by David Wilson</p>
+            <div style="margin-top: 12px;">
+              <p style="font-size: 0.9rem;">Completed 1 week ago</p>
+            </div>
+            <span class="request-status status-completed">Completed</span>
+          </div>
+        </div>
+
+        <div class="request-card">
+          <img src="../assets/images/logo.png" alt="Item">
+          <div class="request-info">
+            <h3 style="margin-bottom: 8px;">Wireless Headphones</h3>
+            <p style="color: #9aa5c3; margin-bottom: 8px;">Request from Lisa Brown</p>
+            <div style="margin-top: 12px;">
+              <p style="font-size: 0.9rem;">Rejected 2 weeks ago</p>
+            </div>
+            <span class="request-status status-rejected">Rejected</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="sitefoot">
+    <div class="container">
+      <div class="sitefoot__bottom">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          <img src="../assets/images/logo.png" alt="SwapIt Logo" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+          <small>SwapIt Ltd. &copy; All rights reserved <span id="year">2025</span></small>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Show selected tab
+      document.getElementById(tabName + '-tab').classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    async function approveRequest(requestId) {
+      if (confirm('Are you sure you want to approve this request?')) {
+        alert('Request approved! The borrower has been notified.');
+        // TODO: Call API to approve request
+        location.reload();
+      }
+    }
+
+    async function rejectRequest(requestId) {
+      const reason = prompt('Please provide a reason for rejection (optional):');
+      if (reason !== null) {
+        alert('Request rejected. The user has been notified.');
+        // TODO: Call API to reject request
+        location.reload();
+      }
+    }
+
+    async function cancelRequest(requestId) {
+      if (confirm('Are you sure you want to cancel this request?')) {
+        alert('Request cancelled successfully.');
+        // TODO: Call API to cancel request
+        location.reload();
+      }
+    }
+
+    function viewDetails(requestId) {
+      alert('View details for request #' + requestId);
+      // TODO: Navigate to request details page or show modal
+    }
+
+    // Auth check
+    async function checkAuth() {
+      if (window.swapitAuth) {
+        await window.swapitAuth.waitForReady();
+        if (!window.swapitAuth.isAuthenticated()) {
+          window.location.href = 'login.html';
+        }
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkAuth);
+    } else {
+      checkAuth();
+    }
+  </script>
+</body>
+</html>
