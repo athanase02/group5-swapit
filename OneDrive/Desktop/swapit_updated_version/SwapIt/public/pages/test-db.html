@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .result {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>Database Connection Test</h1>
+    <div id="result" class="result">
+        Testing connection...
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                const response = await fetch('/api/test-db.php');
+                const contentType = response.headers.get('content-type');
+                
+                // Check if response is JSON
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    resultDiv.innerHTML = `
+                        <h2 class="error">Test Failed</h2>
+                        <p>API returned non-JSON response (possibly a PHP error)</p>
+                        <h3>Response:</h3>
+                        <pre>${text}</pre>
+                    `;
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                let html = '<h2>Test Results:</h2>';
+                
+                // Connection status
+                html += `<p class="${data.connection ? 'success' : 'error'}">
+                    Database Connection: ${data.connection ? 'Success' : 'Failed'}
+                </p>`;
+                
+                // Database status
+                html += `<p class="${data.database_exists ? 'success' : 'error'}">
+                    Database Exists: ${data.database_exists ? 'Yes' : 'No'}
+                </p>`;
+                
+                // Tables creation status
+                if (data.tables_created && data.tables_created.length > 0) {
+                    html += '<h3>Table Creation Results:</h3><ul>';
+                    data.tables_created.forEach(result => {
+                        const isSuccess = result.startsWith('Success');
+                        html += `<li class="${isSuccess ? 'success' : 'error'}">${result}</li>`;
+                    });
+                    html += '</ul>';
+                }
+                
+                // Error message if any
+                if (data.error) {
+                    html += `<h3 class="error">Error:</h3>
+                    <pre>${data.error}</pre>`;
+                }
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h2 class="error">Test Failed</h2>
+                    <p>Error: ${error.message}</p>
+                    <p>Make sure PHP is running and the database configuration is correct.</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

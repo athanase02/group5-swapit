@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>SwapIt API Test</h1>
+    <button onclick="testCheckAuth()">Test Check Auth</button>
+    <button onclick="testSignup()">Test Signup</button>
+    <div id="result" style="margin-top: 20px; padding: 10px; background: #f0f0f0;"></div>
+    
+    <script>
+        async function testCheckAuth() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing /api/auth.php?action=check_auth...';
+            
+            try {
+                const response = await fetch('/api/auth.php?action=check_auth', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                result.innerHTML = 'Success!<br>' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.innerHTML = 'Error: ' + error.message;
+            }
+        }
+        
+        async function testSignup() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing signup...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'signup');
+                formData.append('email', 'test@example.com');
+                formData.append('password', 'test123456');
+                formData.append('full_name', 'Test User');
+                
+                const response = await fetch('/api/auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                result.innerHTML = 'Response:<br>' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

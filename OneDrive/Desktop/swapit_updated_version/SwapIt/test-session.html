@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Test - SwapIt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0a0b10;
+            color: #ecf1ff;
+        }
+        .test-section {
+            background: #11131a;
+            border: 1px solid #1e2434;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            background: linear-gradient(135deg, #7ef9ff, #5b7cfe);
+            color: #0a0b10;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #7ef9ff33;
+            border-left: 4px solid #7ef9ff;
+        }
+        .error {
+            background: #ff6b6b33;
+            border-left: 4px solid #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Session Persistence Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Login & Navigation</h2>
+        <p>This page helps verify that users stay logged in when navigating between pages.</p>
+        
+        <button onclick="testLogin()">1. Test Login</button>
+        <button onclick="checkAuth()">2. Check Auth Status</button>
+        <button onclick="navigatePages()">3. Navigate to Pages</button>
+        <button onclick="testLogout()">4. Test Logout</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Session Info</h2>
+        <div id="sessionInfo"></div>
+    </div>
+
+    <script src="/public/assets/js/auth-client.js"></script>
+    <script>
+        const statusDiv = document.getElementById('status');
+        const sessionDiv = document.getElementById('sessionInfo');
+
+        async function showStatus(message, isError = false) {
+            const div = document.createElement('div');
+            div.className = `status ${isError ? 'error' : 'success'}`;
+            div.textContent = message;
+            statusDiv.appendChild(div);
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        async function testLogin() {
+            const email = prompt('Enter email (or use test@example.com):', 'test@example.com');
+            const password = prompt('Enter password:', 'password123');
+            
+            if (!email || !password) return;
+            
+            const result = await window.swapitAuth.signIn(email, password);
+            if (result.success) {
+                showStatus('✅ Login successful! Session created.');
+                await displaySessionInfo();
+            } else {
+                showStatus('❌ Login failed: ' + result.message, true);
+            }
+        }
+
+        async function checkAuth() {
+            const user = await window.swapitAuth.checkSession();
+            if (user) {
+                showStatus(`✅ Authenticated as: ${user.email}`);
+                await displaySessionInfo();
+            } else {
+                showStatus('❌ Not authenticated', true);
+            }
+        }
+
+        async function displaySessionInfo() {
+            const user = await window.swapitAuth.checkSession();
+            if (user) {
+                sessionDiv.innerHTML = `
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Name:</strong> ${user.full_name || 'Not set'}</p>
+                    <p><strong>User ID:</strong> ${user.id}</p>
+                    <p><strong>Status:</strong> <span style="color: #7ef9ff">✓ Logged In</span></p>
+                `;
+            } else {
+                sessionDiv.innerHTML = '<p><strong>Status:</strong> <span style="color: #ff6b6b">✗ Not logged in</span></p>';
+            }
+        }
+
+        async function navigatePages() {
+            showStatus('Opening pages in new tabs...');
+            const pages = [
+                '/public/pages/browse.html',
+                '/public/pages/profile.html',
+                '/public/pages/dashboard.html',
+                '/public/pages/cart.html',
+                '/public/pages/add-listing.html'
+            ];
+            
+            pages.forEach(page => {
+                window.open('http://localhost:8080' + page, '_blank');
+            });
+            
+            showStatus('✅ Pages opened. Check if you stay logged in!');
+        }
+
+        async function testLogout() {
+            const result = await window.swapitAuth.signOut();
+            if (result.success) {
+                showStatus('✅ Logout successful');
+                await displaySessionInfo();
+            } else {
+                showStatus('❌ Logout failed', true);
+            }
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            setTimeout(displaySessionInfo, 500);
+        });
+    </script>
+</body>
+</html>
